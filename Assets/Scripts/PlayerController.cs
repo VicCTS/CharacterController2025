@@ -45,6 +45,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _hands;
     [SerializeField] private Transform _grabedObject;
 
+    [SerializeField] float _speedChangeRate = 10;
+    float _speed;
+    float _animationSpeed;
+
+    float targetAngle;
+
+    bool isSprinting = false;
+    float _sprintSpeed = 8;
+
+    public float jumpTimeOut = 0.5f;
+    public float fallTimeOut = 0.15f;
+
+    float _jumpTimeOutDelta;
+    float _fallTimeOutDelta;
+
     void Awake()
     {
         _controller = GetComponent<CharacterController>();
@@ -63,7 +78,8 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        _jumpTimeOutDelta = jumpTimeOut;
+        _fallTimeOutDelta = fallTimeOut;
     }
 
     // Update is called once per frame
@@ -129,20 +145,13 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    [SerializeField] float _speedChangeRate = 10;
-    float _speed;
-    float _animationSpeed;
-
-    float targetAngle;
-
-    bool isSprinting = false;
-    float _sprintSpeed = 8;
+    
 
     void Movement()
     {
         Vector3 direction = new Vector3(_moveInput.x, 0, _moveInput.y);
 
-        float targetSpeed;
+        /*float targetSpeed;
 
         if(isSprinting)
         {
@@ -151,7 +160,9 @@ public class PlayerController : MonoBehaviour
         else
         {
             targetSpeed = _movementSpeed;
-        }
+        }*/
+
+        float targetSpeed = _movementSpeed;
 
         if(direction == Vector3.zero)
         {
@@ -164,7 +175,7 @@ public class PlayerController : MonoBehaviour
 
         if(currentSpeed < targetSpeed - speedOffset || currentSpeed > targetSpeed + speedOffset)
         {
-            _speed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * _speedChangeRate);
+            _speed = Mathf.Lerp(currentSpeed, targetSpeed * direction.magnitude, Time.deltaTime * _speedChangeRate);
 
             _speed = Mathf.Round(_speed * 1000f) / 1000f;
         }
@@ -268,10 +279,14 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        //_animator.SetBool("IsJumping", true);
-        _animator.SetBool("Jump", true);
+        if(_jumpTimeOutDelta <= 0)
+        {
+            _animator.SetBool("Jump", true);
 
-        _playerGravity.y = Mathf.Sqrt(_jumpHeight * -2 * _gravity);
+            _playerGravity.y = Mathf.Sqrt(_jumpHeight * -2 * _gravity);
+        }
+        //_animator.SetBool("IsJumping", true);
+        
 
         //_controller.Move(_playerGravity * Time.deltaTime);
     }
@@ -292,8 +307,12 @@ public class PlayerController : MonoBehaviour
 
         _animator.SetBool("Grounded", IsGrounded());
 
+        
+
         if(IsGrounded())
         {
+            _fallTimeOutDelta = fallTimeOut;
+
             _animator.SetBool("Jump", false);
             _animator.SetBool("Fall", false);
 
@@ -301,10 +320,26 @@ public class PlayerController : MonoBehaviour
             {
                 _playerGravity.y = -2;
             }
+
+            if(_jumpTimeOutDelta >= 0)
+            {
+                _jumpTimeOutDelta -= Time.deltaTime;
+            }
         }
         else
         {
-            _animator.SetBool("Fall", true);
+            _jumpTimeOutDelta = jumpTimeOut;
+
+            if(_fallTimeOutDelta >= 0)
+            {
+                _fallTimeOutDelta -= Time.deltaTime;
+            }
+            else
+            {
+                _animator.SetBool("Fall", true);
+            }
+
+            
             _playerGravity.y += _gravity * Time.deltaTime;
         }
     }

@@ -1708,6 +1708,8 @@ MonoBehaviour:
   _hands: {fileID: 0}
   _grabedObject: {fileID: 0}
   _speedChangeRate: 10
+  jumpTimeOut: 0.5
+  fallTimeOut: 0.15
 --- !u!143 &654911432
 CharacterController:
   m_ObjectHideFlags: 0
@@ -4294,7 +4296,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!183 &1836723892
 Cloth:
   m_ObjectHideFlags: 0
@@ -4984,6 +4986,8 @@ MonoBehaviour:
   _hands: {fileID: 1355572657}
   _grabedObject: {fileID: 0}
   _speedChangeRate: 10
+  jumpTimeOut: 0.5
+  fallTimeOut: 0.15
 --- !u!114 &2136896946
 MonoBehaviour:
   m_ObjectHideFlags: 0
